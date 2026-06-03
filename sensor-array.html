@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Particle Accelerator Sensor Array — Nicholas Gellerman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #6b6b6b;
+    --line: #e4e4e4;
+    --line-strong: #0a0a0a;
+    --display: "Space Grotesk", "Helvetica Neue", Helvetica, sans-serif;
+    --mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --maxw: 1180px;
+    --reading: 760px;
+    --gutter: clamp(20px, 5vw, 64px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--display);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: #0a0a0a; color: #fff; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+  .reading { max-width: var(--reading); margin-inline: auto; }
+
+  /* ---------- NAV ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .brand {
+    font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .brand .dot { width: 10px; height: 10px; background: var(--fg); border-radius: 50%; }
+  .nav-links { display: flex; gap: clamp(16px, 3vw, 40px); align-items: center; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    color: var(--muted); padding: 6px 0; position: relative;
+  }
+  .nav-links a::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1.5px;
+    background: var(--fg); transition: right .25s ease;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { right: 0; }
+
+  /* ---------- ARTICLE HEADER ---------- */
+  .post-head { padding-top: clamp(40px, 7vw, 84px); padding-bottom: clamp(24px, 3vw, 36px); }
+  .back {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+  .back .arrow { transition: transform .2s ease; }
+  .back:hover { color: var(--fg); }
+  .back:hover .arrow { transform: translateX(-3px); }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; gap: 14px; align-items: center; margin-bottom: 18px;
+  }
+  .eyebrow .rule { width: 40px; height: 1px; background: var(--line-strong); }
+
+  .post-head h1 {
+    margin: 0; font-weight: 700; letter-spacing: -0.035em; line-height: 0.95;
+    font-size: clamp(34px, 6vw, 76px); text-transform: uppercase;
+  }
+  .post-head .sub {
+    margin: clamp(18px, 2.5vw, 26px) 0 0; color: var(--muted);
+    font-size: clamp(17px, 2vw, 21px); line-height: 1.55; max-width: 62ch; text-wrap: pretty;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center;
+    margin-top: clamp(22px, 3vw, 32px);
+    padding-top: clamp(22px, 3vw, 28px); border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+  }
+  .meta b { color: var(--fg); font-weight: 700; }
+
+  /* ---------- SECTIONS ---------- */
+  .section { margin-top: clamp(48px, 7vw, 88px); }
+  .section h2 {
+    margin: 0 0 18px; font-weight: 700; letter-spacing: -0.02em;
+    font-size: clamp(24px, 3.4vw, 34px);
+  }
+  .kicker {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; gap: 14px; align-items: center; margin-bottom: 16px;
+  }
+  .kicker .rule { width: 40px; height: 1px; background: var(--line-strong); }
+  .section p {
+    margin: 0 0 20px; font-size: 17px; line-height: 1.7; color: #2a2a2a; text-wrap: pretty;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* ---------- FIGURE ---------- */
+  figure { margin: clamp(28px, 4vw, 40px) 0 0; }
+  .frame {
+    border: 1px solid var(--line-strong);
+    background:
+      linear-gradient(#fbfbfb, #f4f4f5);
+    padding: clamp(10px, 2vw, 22px);
+    display: grid; place-items: center;
+  }
+  .frame img { width: 100%; height: auto; }
+  figcaption {
+    margin-top: 14px;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);
+    text-wrap: pretty;
+  }
+  figcaption b { color: var(--fg); font-weight: 700; }
+
+  /* full-bleed figure breaks out of the reading column */
+  .figure-wide { max-width: var(--maxw); }
+
+  /* ---------- SPEC LIST ---------- */
+  .specs {
+    list-style: none; margin: clamp(24px, 3vw, 32px) 0 0; padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .specs li {
+    display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; align-items: baseline;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .specs .label { font-size: 16px; line-height: 1.5; color: #2a2a2a; text-wrap: pretty; }
+  .specs .value {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    color: var(--fg); text-align: right; white-space: nowrap;
+  }
+  .specs .value.tbd { color: var(--muted); }
+
+  /* ---------- STEP SEQUENCE ---------- */
+  .steps { margin-top: clamp(28px, 4vw, 40px); display: grid; gap: clamp(28px, 4vw, 44px); }
+  .step { display: grid; grid-template-columns: auto 1fr; gap: 20px 24px; align-items: start; }
+  .step-num {
+    width: 44px; height: 44px; flex: none;
+    border: 1.5px solid var(--fg); border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-weight: 700; font-size: 15px;
+  }
+  .step-body { min-width: 0; }
+  .step-body p {
+    margin: 9px 0 0; font-size: 17px; line-height: 1.7; color: #2a2a2a; text-wrap: pretty;
+  }
+  .step-body .step-fig { margin-top: 18px; }
+  .step-eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ---------- CHAPTER DIVIDER ---------- */
+  .chapter { margin-top: clamp(72px, 11vw, 140px); }
+  .chapter-top { border-top: 2px solid var(--line-strong); padding-top: clamp(20px, 3vw, 28px); }
+  .chapter-eyebrow {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+  }
+  .chapter h2 {
+    margin: 0; font-weight: 700; letter-spacing: -0.03em; line-height: 1.0;
+    font-size: clamp(28px, 4.4vw, 52px); text-transform: uppercase;
+  }
+  .chapter .lead {
+    margin: clamp(18px, 2.5vw, 24px) 0 0; font-size: clamp(16px, 1.9vw, 19px);
+    line-height: 1.65; color: #2a2a2a; max-width: 62ch; text-wrap: pretty;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.site {
+    margin-top: clamp(64px, 9vw, 120px);
+    border-top: 1px solid var(--line-strong);
+    padding: clamp(36px, 5vw, 56px) 0 clamp(48px, 6vw, 72px);
+    display: flex; flex-wrap: wrap; gap: 16px 32px;
+    align-items: center; justify-content: space-between;
+  }
+  footer.site .copy { font-weight: 700; letter-spacing: -0.01em; }
+  footer.site .made { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  footer.site .made b { color: var(--fg); font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .meta { gap: 8px 16px; }
+    .step { grid-template-columns: 1fr; gap: 14px; }
+    .step-num { width: 38px; height: 38px; font-size: 14px; }
+    .specs li { grid-template-columns: 1fr; gap: 4px; }
+    .specs .value { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a href="index.html#top" class="brand"><span class="dot"></span>Nicholas Gellerman</a>
+      <nav class="nav-links">
+        <a href="index.html#top">Portfolio</a>
+        <a href="index.html#blog">Blog</a>
+        <a href="index.html#contact">Contact &amp; About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap">
+      <!-- ============ HEADER ============ -->
+      <header class="post-head reading">
+        <a href="index.html#top" class="back"><span class="arrow">←</span> Back to Portfolio</a>
+        <div class="eyebrow"><span class="rule"></span> Hardware · Research · LBNL</div>
+        <h1>Particle Accelerator Sensor Array</h1>
+        <p class="sub">Designing a precise, repeatable manufacturing process to align silicon sensor modules for the Silicon Vertex Detector — part of the Electron Ion Collider now under construction at Brookhaven, New York.</p>
+        <div class="meta">
+          <span><b>Role</b> &nbsp;Fabrication · Tooling Design</span>
+          <span><b>Lab</b> &nbsp;LBNL · RNC Group</span>
+          <span><b>Duration</b> &nbsp;Two Semesters</span>
+        </div>
+      </header>
+
+      <!-- ============ INTRODUCTION ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> Introduction</div>
+        <h2>Building a detector for the Electron Ion Collider</h2>
+        <p>I conducted this research across two semesters working part-time for the Relativistic Nuclear Collision Group (RNC) at the Lawrence Berkeley National Lab (LBNL). I worked on the fabrication of a large sensor module called the Silicon Vertex Detector (SVD) for the Electron Ion Collider, currently under construction in New York.</p>
+        <p>My main responsibilities were creating test sensor arrays for software development, and creating a precise and repeatable manufacturing process that aligns silicon modules for mounting on a large carbon fiber disk.</p>
+        <figure>
+          <div class="frame">
+            <img src="assets/lbnl/overview.png" alt="Cross-section of the detector disk showing belly-up and belly-down sensor modules arranged radially" loading="lazy" />
+          </div>
+          <figcaption><b>Detector overview —</b> sensor modules arranged across the carbon fiber disk in alternating "belly up" and "belly down" orientations.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ THE PROBLEM ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> The Problem</div>
+        <h2>Aligning silicon to carbon fiber, ~2,300 times</h2>
+        <p>My focus was the assembly of the sensor modules — specifically, creating tooling to align the silicon sensor onto a carbon fiber flat sheet. This relatively simple-sounding task becomes extremely difficult given the tight tolerances and handling requirements involved.</p>
+        <figure>
+          <div class="frame">
+            <img src="assets/lbnl/sensor-module.png" alt="Dimensioned diagram of a sensor module: carbon fiber flat sheet with silicon sensors, FPC bridges, and overall length callouts" loading="lazy" />
+          </div>
+          <figcaption><b>Module specification —</b> silicon sensors bridged across a 0.15 mm carbon fiber flat sheet. Total length runs 125.5 mm for a 5-RSU module and 147.1 mm for 6 RSU.</figcaption>
+        </figure>
+        <ul class="specs">
+          <li><span class="label">Position precision goal — translation &amp; rotation</span><span class="value">0.2 mm</span></li>
+          <li><span class="label">Repeatable across full production run</span><span class="value">~2,300 alignments</span></li>
+          <li><span class="label">No bending or abrasion of sensors — vacuum handling only</span><span class="value">Required</span></li>
+          <li><span class="label">Accommodate two different sensor lengths</span><span class="value tbd">Stretch goal</span></li>
+        </ul>
+      </section>
+
+      <!-- ============ SOLUTION: ALIGNMENT ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> Solution · Alignment</div>
+        <h2>Two matched pre-alignment jigs</h2>
+        <p>Alignment is achieved using two nearly identical pre-alignment jigs — one for the sensor and one for the carbon fiber. The carbon fiber jig contains a vacuum chamber so the sheet cannot shift during final alignment. Each sheet is aligned physically against a set of pins or flat walls, and the result is then checked optically with a microscope using fiduciary marks on the sensor.</p>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/jig-1.png" alt="CAD render of the two pre-alignment jigs side by side, one fitted with a vacuum port" loading="lazy" />
+          </div>
+          <figcaption><b>The two jigs —</b> matched sensor and carbon fiber pre-alignment fixtures. The right-hand fixture carries the vacuum port that locks the flat sheet in place.</figcaption>
+        </figure>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/jig-2.png" alt="Detail CAD render of an alignment jig showing locating pins and the seated sensor pocket" loading="lazy" />
+          </div>
+          <figcaption><b>Locating detail —</b> physical pins and flat walls register each sheet before the optical fiduciary check.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ SOLUTION: HANDLING ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> Solution · Handling</div>
+        <h2>Transferring the sensor without touching it</h2>
+        <p>Because the silicon can't be bent or abraded, every transfer happens through a vacuum grabber fitted with small, ESD-safe suction cups that distribute the force evenly. The grabber keys into pinhole-and-slot features to carry the alignment from one jig to the next.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <span class="step-eyebrow">Pick up</span>
+              <p>A vacuum grabber with small, ESD-safe suction cups lifts the sensor. The force is distributed across the cups to avoid bending the fragile silicon.</p>
+              <figure class="step-fig">
+                <div class="frame">
+                  <img src="assets/lbnl/step-1.png" alt="CAD render: vacuum grabber positioned above the sensor with distributed suction cups" loading="lazy" />
+                </div>
+              </figure>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <span class="step-eyebrow">Key in</span>
+              <p>The grabber keys into a pinhole and slot, retaining the alignment captured in the first pre-alignment jig.</p>
+              <figure class="step-fig">
+                <div class="frame">
+                  <img src="assets/lbnl/step-2.png" alt="CAD render: grabber engaged with pinhole and slot features on the first jig" loading="lazy" />
+                </div>
+              </figure>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <span class="step-eyebrow">Transfer</span>
+              <p>The sensor is carefully transferred over to the second pre-alignment jig, holding position the entire way.</p>
+              <figure class="step-fig">
+                <div class="frame">
+                  <img src="assets/lbnl/step-3.png" alt="CAD render: sensor being moved between the two pre-alignment jigs" loading="lazy" />
+                </div>
+              </figure>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-body">
+              <span class="step-eyebrow">Bond</span>
+              <p>The grabber keys into an identically positioned pinhole and slot on the second jig and glues the sensor to the carbon fiber — preserving the alignment through the bond.</p>
+              <figure class="step-fig">
+                <div class="frame">
+                  <img src="assets/lbnl/step-4.png" alt="CAD render: grabber seated on the second jig, bonding the sensor to the carbon fiber flat sheet" loading="lazy" />
+                </div>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CHAPTER II: ASSEMBLY & MOUNTING ============ -->
+      <section class="chapter reading">
+        <div class="chapter-top">
+          <div class="chapter-eyebrow">Part II</div>
+          <h2>Sensor Module Assembly &amp; Mounting</h2>
+          <p class="lead">This is a tool I designed to glue and wire-bond thin silicon sensors to PCB carrier boards. These sensors are scaled-down versions of the ones that will be implemented in the Electron Ion Collider. Over two months I assembled and implemented 20 PCBs, which were tested and validated at CERN and are now being used to run a variety of experiments at LBNL.</p>
+        </div>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/complete-board.jpg" alt="Four completed sensor carrier boards with clear acrylic protection covers, laid out on an ESD mat" loading="lazy" />
+          </div>
+          <figcaption><b>Completed boards —</b> four finished boards ready for transport to CERN, fitted with custom-designed acrylic protection covers.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ ASSEMBLY PROCESS ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> Assembly Process</div>
+        <h2>Glue and wire-bond, repeatably</h2>
+        <p>I created a simple jig that lets a technician — in this case, me — quickly glue and wire-bond sensors to boards consistently and precisely. The jig securely holds the PCB while the sensor is aligned optically under a microscope. A foam retaining bar is then screwed down to lock in the alignment.</p>
+        <p>The jig can then be flipped so glue can be applied through holes in the PCB. Once the glue cures, the retaining bar is removed and wire bonding is performed in the same jig — no re-alignment needed.</p>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/assembly-jig.png" alt="CAD render of the assembly jig: a two-plate fixture with spring-loaded retaining arms on guide posts" loading="lazy" />
+          </div>
+          <figcaption><b>Assembly jig —</b> holds the PCB and a spring-loaded retaining bar so the board can be flipped for gluing and returned for wire bonding without losing alignment.</figcaption>
+        </figure>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/microscope.jpg" alt="Microscope station with a board in the jig under a Leica scope, sensor detail shown on the monitor above" loading="lazy" />
+          </div>
+          <figcaption>Optical alignment — the sensor is positioned under a microscope and aligned carefully by hand using fiduciary markers on the silicon sensor.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ MOUNTING FIXTURES ============ -->
+      <section class="section reading">
+        <div class="kicker"><span class="rule"></span> Mounting Fixtures</div>
+        <h2>Safe, interchangeable mounting</h2>
+        <p>I designed a mounting fixture so the physicists running experiments can quickly and safely mount the PCBs in different arrays. Each mount gives the PCB a strong aluminum case that protects the delicate sensors and surface-mount components.</p>
+        <p>The mounts screw into a grid of threaded holes and are designed so the sensor windows always line up perfectly — even across different types of PCB. Arrays are usually set up in custom enclosures for tight cable management.</p>
+        <p>Those enclosures were also fitted with a water-cooling block, a heater, and thermocouples to record the thermal characteristics of the sensors.</p>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/lbnl/holder.png" alt="CAD render of the aluminum mounting fixture: a backing plate and front cover with matching sensor windows" loading="lazy" />
+          </div>
+          <figcaption><b>Mounting fixture —</b> an aluminum case with a registered sensor window. The mount screws to a threaded grid so windows align consistently between board types.</figcaption>
+        </figure>
+        <figure class="figure-wide">
+          <div class="frame">
+            <img src="assets/sensor-array.jpg" alt="Multiple mounted sensor boards arranged in an array on a lab bench with cabling" loading="lazy" />
+          </div>
+          <figcaption><b>Assembled array —</b> mounted boards set up in an enclosure with water cooling, a heater, and thermocouples for thermal characterization.</figcaption>
+        </figure>
+      </section>
+    </article>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site wrap">
+    <div class="copy">© NicholasGellerman.com</div>
+    <div class="made">Made with <b>♥</b> by <b>Nicholas</b></div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SnoScout — Nicholas Gellerman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #6b6b6b;
+    --line: #e4e4e4;
+    --line-strong: #0a0a0a;
+    --display: "Space Grotesk", "Helvetica Neue", Helvetica, sans-serif;
+    --mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --maxw: 1180px;
+    --reading: 760px;
+    --gutter: clamp(20px, 5vw, 64px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--display);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: #0a0a0a; color: #fff; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+  .reading { max-width: var(--reading); margin-inline: auto; }
+
+  /* ---------- NAV ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .brand {
+    font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .brand .dot { width: 10px; height: 10px; background: var(--fg); border-radius: 50%; }
+  .nav-links { display: flex; gap: clamp(16px, 3vw, 40px); align-items: center; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    color: var(--muted); padding: 6px 0; position: relative;
+  }
+  .nav-links a::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1.5px;
+    background: var(--fg); transition: right .25s ease;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { right: 0; }
+
+  /* ---------- ARTICLE HEADER ---------- */
+  .post-head { padding-top: clamp(40px, 7vw, 84px); padding-bottom: clamp(24px, 3vw, 36px); }
+  .back {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+  .back .arrow { transition: transform .2s ease; }
+  .back:hover { color: var(--fg); }
+  .back:hover .arrow { transform: translateX(-3px); }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; gap: 14px; align-items: center; margin-bottom: 18px;
+  }
+  .eyebrow .rule { width: 40px; height: 1px; background: var(--line-strong); }
+
+  .post-head h1 {
+    margin: 0; font-weight: 700; letter-spacing: -0.035em; line-height: 0.95;
+    font-size: clamp(40px, 7vw, 84px); text-transform: uppercase;
+  }
+  .post-head .sub {
+    margin: clamp(18px, 2.5vw, 26px) 0 0; color: var(--muted);
+    font-size: clamp(17px, 2vw, 21px); line-height: 1.55; max-width: 60ch; text-wrap: pretty;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center;
+    margin-top: clamp(22px, 3vw, 32px);
+    padding-top: clamp(22px, 3vw, 28px); border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+  }
+  .meta b { color: var(--fg); font-weight: 700; }
+
+  /* ---------- VIDEO ---------- */
+  .video-block { margin-top: clamp(36px, 5vw, 56px); }
+  .video-frame {
+    position: relative; width: 100%; aspect-ratio: 16 / 9;
+    border: 1px solid var(--line-strong); overflow: hidden; background: #000;
+  }
+  .video-frame iframe, .video-frame video {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+  }
+  /* YouTube facade: thumbnail + play button, swaps to real player on click */
+  .video-frame { cursor: pointer; }
+  .video-frame .yt-thumb {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .video-frame .yt-play {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 84px; height: 84px; border-radius: 50%;
+    background: rgba(10,10,10,0.82); border: 1.5px solid #fff;
+    display: grid; place-items: center; transition: background .2s ease, transform .2s ease;
+  }
+  .video-frame .yt-play::after {
+    content: ""; width: 0; height: 0; margin-left: 6px;
+    border-left: 22px solid #fff;
+    border-top: 14px solid transparent; border-bottom: 14px solid transparent;
+  }
+  .video-frame:hover .yt-play { background: #0a0a0a; transform: translate(-50%, -50%) scale(1.06); }
+  .video-frame:focus-visible { outline: 2px solid #0a0a0a; outline-offset: 3px; }
+  .cap-link { color: var(--fg); border-bottom: 1.5px solid var(--fg); padding-bottom: 1px; white-space: nowrap; }
+  /* placeholder shown until a real embed is added */
+  .video-frame .pending {
+    position: absolute; inset: 0; display: grid; place-content: center; gap: 14px;
+    background-image: repeating-linear-gradient(
+      -45deg, #fff 0, #fff 11px, #f3f3f3 11px, #f3f3f3 12px);
+    text-align: center;
+  }
+  .video-frame .pending .play {
+    width: 64px; height: 64px; margin: 0 auto; border-radius: 50%;
+    border: 1.5px solid var(--fg); display: grid; place-items: center;
+  }
+  .video-frame .pending .play::after {
+    content: ""; width: 0; height: 0; margin-left: 4px;
+    border-left: 16px solid var(--fg);
+    border-top: 11px solid transparent; border-bottom: 11px solid transparent;
+  }
+  .video-frame .pending span {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--muted);
+  }
+  .caption {
+    margin-top: 16px;
+    font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--muted);
+    text-align: center; text-wrap: pretty;
+  }
+  .caption b { color: var(--fg); font-weight: 700; }
+
+  /* ---------- BODY COPY ---------- */
+  .body { margin-top: clamp(48px, 7vw, 88px); }
+  .body h2 {
+    margin: 0 0 16px; font-weight: 700; letter-spacing: -0.02em;
+    font-size: clamp(22px, 3vw, 30px);
+  }
+  .body p {
+    margin: 0 0 20px; font-size: 17px; line-height: 1.7; color: #2a2a2a; text-wrap: pretty;
+  }
+  .body p:last-child { margin-bottom: 0; }
+
+  /* ---------- POSTER ---------- */
+  .poster-block { margin-top: clamp(56px, 8vw, 96px); }
+  .poster-label {
+    display: flex; align-items: baseline; gap: 16px; margin-bottom: clamp(18px, 2.5vw, 26px);
+  }
+  .poster-label h2 {
+    margin: 0; font-family: var(--mono); font-weight: 700;
+    font-size: clamp(13px, 1.6vw, 15px); letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap;
+  }
+  .poster-label .rule { flex: 1; height: 1px; background: var(--line-strong); }
+  .poster-frame {
+    width: 100%; height: clamp(520px, 88vh, 1100px);
+    border: 1px solid var(--line-strong); overflow: hidden; background: #f6f6f6;
+  }
+  .poster-frame iframe { width: 100%; height: 100%; border: 0; }
+  .poster-actions { margin-top: 16px; display: flex; gap: 18px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase;
+    padding-bottom: 4px; border-bottom: 1.5px solid var(--fg);
+  }
+  .btn .arrow { transition: transform .2s ease; }
+  .btn:hover .arrow { transform: translate(3px, -3px); }
+
+  /* ---------- FOOTER ---------- */
+  footer.site {
+    margin-top: clamp(64px, 9vw, 120px);
+    border-top: 1px solid var(--line-strong);
+    padding: clamp(36px, 5vw, 56px) 0 clamp(48px, 6vw, 72px);
+    display: flex; flex-wrap: wrap; gap: 16px 32px;
+    align-items: center; justify-content: space-between;
+  }
+  footer.site .copy { font-weight: 700; letter-spacing: -0.01em; }
+  footer.site .made { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  footer.site .made b { color: var(--fg); font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .meta { gap: 8px 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a href="index.html#top" class="brand"><span class="dot"></span>Nicholas Gellerman</a>
+      <nav class="nav-links">
+        <a href="index.html#top">Portfolio</a>
+        <a href="index.html#blog">Blog</a>
+        <a href="index.html#contact">Contact &amp; About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap">
+      <!-- ============ HEADER ============ -->
+      <header class="post-head reading">
+        <a href="index.html#top" class="back"><span class="arrow">←</span> Back to Portfolio</a>
+        <div class="eyebrow"><span class="rule"></span> Hardware · Search &amp; Rescue</div>
+        <h1>SnoScout</h1>
+        <p class="sub">A ground-based search-and-rescue rover that autonomously localizes buried avalanche beacons — pairing a software-defined radio with GPS-encoder sensor fusion to pinpoint a victim before the rescue window closes.</p>
+        <div class="meta">
+          <span><b>Role</b> &nbsp;Hardware Integration · Signals</span>
+          <span><b>Stack</b> &nbsp;ESP 32 · Serial Communications · GNU Radio</span>
+          <span><b>Year</b> &nbsp;2025</span>
+        </div>
+      </header>
+
+      <!-- ============ DEMO VIDEO ============ -->
+      <section class="video-block reading">
+        <div class="video-frame" id="ytFacade" data-id="xhgLpH1pRmo" role="button" tabindex="0" aria-label="Play SnoScout demo video">
+          <img class="yt-thumb" src="https://i.ytimg.com/vi/xhgLpH1pRmo/maxresdefault.jpg" alt="SnoScout demo video thumbnail" />
+          <div class="yt-play" aria-hidden="true"></div>
+        </div>
+        <p class="caption">Demo — Technical overview and system explanation of SnoScout including driving and beacon detection demonstration. <a href="https://youtu.be/xhgLpH1pRmo" target="_blank" rel="noopener" class="cap-link">Watch on YouTube ↗</a></p>
+      </section>
+
+      <!-- ============ BODY ============ -->
+      <section class="body reading">
+        <h2>How it works</h2>
+        <p>SnoScout listens for the standard 457 kHz avalanche-transceiver pulse using a software-defined radio feeding a custom GNU Radio pipeline that extracts and tracks the signal in real time. As the rover drives, a GPS-encoder sensor fusion system tags every signal-strength reading with a precise position.</p>
+        <p>Those SNR-weighted geospatial samples are clustered with DBSCAN to reject noise and converge on the most probable beacon location — turning a scatter of noisy radio readings into a single coordinate a rescuer can dig at.</p>
+      </section>
+
+      <!-- ============ POSTER ============ -->
+      <section class="poster-block">
+        <div class="poster-label reading">
+          <h2>Project Poster</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="reading">
+          <div class="poster-frame">
+            <iframe src="assets/SnoScout-Poster.pdf#view=FitH" title="SnoScout project poster"></iframe>
+          </div>
+          <div class="poster-actions">
+            <a href="assets/SnoScout-Poster.pdf" target="_blank" rel="noopener" class="btn">Open Full Poster <span class="arrow">↗</span></a>
+          </div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site wrap">
+    <div class="copy">© NicholasGellerman.com</div>
+    <div class="made">Made with <b>♥</b> by <b>Nicholas</b></div>
+  </footer>
+
+  <script>
+    // YouTube facade: load the real player only when the user clicks/taps.
+    // Avoids sandbox "configuration error" on initial load and keeps the page light.
+    (function () {
+      const f = document.getElementById('ytFacade');
+      if (!f) return;
+      const id = f.dataset.id;
+
+      // If the maxres thumbnail 404s (not all videos have one), fall back to hqdefault.
+      const thumb = f.querySelector('.yt-thumb');
+      thumb.addEventListener('error', () => {
+        thumb.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+      }, { once: true });
+
+      function play() {
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+        iframe.title = 'SnoScout demo video';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        f.innerHTML = '';
+        f.style.cursor = 'default';
+        f.appendChild(iframe);
+      }
+      f.addEventListener('click', play);
+      f.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); }
+      });
+    })();
+  </script>
+</body>
+</html>

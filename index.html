@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Your Name — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     PERSONALIZE HERE — swap names, links, and the tokens below.
+     ============================================================ */
+  :root {
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #6b6b6b;
+    --line: #e4e4e4;
+    --line-strong: #0a0a0a;
+    --display: "Space Grotesk", "Helvetica Neue", Helvetica, sans-serif;
+    --mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --maxw: 1180px;
+    --gutter: clamp(20px, 5vw, 64px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--display);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: #0a0a0a; color: #fff; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+
+  /* ---------- NAV ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .brand {
+    font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .brand .dot { width: 10px; height: 10px; background: var(--fg); border-radius: 50%; }
+  .nav-links { display: flex; gap: clamp(16px, 3vw, 40px); align-items: center; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    color: var(--muted); padding: 6px 0; position: relative;
+  }
+  .nav-links a::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1.5px;
+    background: var(--fg); transition: right .25s ease;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { right: 0; }
+
+  /* ---------- HERO ---------- */
+  .hero { padding-top: clamp(48px, 10vw, 110px); padding-bottom: clamp(28px, 5vw, 56px); text-align: center; }
+  .hero h1 {
+    margin: 0; font-weight: 700; letter-spacing: -0.04em; line-height: 0.92;
+    font-size: clamp(40px, 11.5vw, 150px); text-transform: uppercase; white-space: nowrap;
+  }
+  .hero-sub {
+    margin-top: clamp(20px, 3vw, 36px);
+    display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: center;
+  }
+  .cat {
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 9px 18px;
+    border: 1.5px solid var(--fg); border-radius: 100px;
+    transition: background .2s ease, color .2s ease;
+  }
+  .cat:hover { background: var(--fg); color: var(--bg); }
+  .hero-tag { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* art strip */
+  .art-strip {
+    margin-top: clamp(28px, 5vw, 56px);
+    height: clamp(90px, 13vw, 168px);
+    border: 1px solid var(--line-strong);
+  }
+
+  /* ---------- COLUMNS ---------- */
+  .columns {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(28px, 5vw, 64px);
+    margin-top: clamp(48px, 7vw, 96px);
+  }
+  .col { display: flex; flex-direction: column; }
+
+  /* ---------- SECTION LABEL ---------- */
+  .section-label {
+    display: flex; align-items: baseline; gap: 16px;
+    margin: 0 0 clamp(20px, 3vw, 32px);
+  }
+  .section-label h2 {
+    margin: 0; font-family: var(--mono); font-weight: 700;
+    font-size: clamp(13px, 1.6vw, 15px); letter-spacing: 0.18em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .section-label .rule { flex: 1; height: 1px; background: var(--line-strong); }
+  .section-label .count { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* ---------- PROJECT ---------- */
+  .project {
+    padding: clamp(22px, 3vw, 34px) 0;
+    border-top: 1px solid var(--line);
+  }
+  .project:first-of-type { border-top: 1px solid var(--line-strong); }
+  .pj-media { margin-bottom: 18px; }
+  .pj-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .project h3 {
+    margin: 12px 0 14px; font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.02; font-size: clamp(24px, 2.8vw, 36px);
+  }
+  .project p {
+    margin: 0; color: var(--muted);
+    font-size: clamp(15px, 1.6vw, 16px); line-height: 1.6; text-wrap: pretty;
+  }
+  .pj-cta {
+    display: inline-flex; align-items: center; gap: 9px; margin-top: 24px;
+    font-family: var(--mono); font-size: 13px; letter-spacing: 0.02em;
+    text-transform: uppercase; padding-bottom: 4px;
+    border-bottom: 1.5px solid var(--fg);
+  }
+  .pj-cta .arrow { transition: transform .2s ease; }
+  .pj-cta:hover .arrow { transform: translate(3px, -3px); }
+
+  /* image placeholder */
+  .ph {
+    position: relative; width: 100%; aspect-ratio: 4 / 3;
+    border: 1px solid var(--line-strong);
+    background-image: repeating-linear-gradient(
+      -45deg, transparent 0, transparent 9px,
+      rgba(10,10,10,0.06) 9px, rgba(10,10,10,0.06) 10px);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .ph span {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em;
+    color: var(--muted); background: var(--bg);
+    padding: 6px 12px; border: 1px solid var(--line-strong);
+  }
+  .ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .ph video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---------- REVIEWS ---------- */
+  .reviews { padding: clamp(72px, 10vw, 140px) 0 clamp(48px, 7vw, 90px); }
+  .reviews-head { text-align: center; margin-bottom: clamp(36px, 5vw, 64px); }
+  .reviews-head h2 {
+    margin: 0; font-weight: 700; letter-spacing: -0.03em;
+    font-size: clamp(40px, 7vw, 84px); text-transform: uppercase;
+  }
+  .reviews-head p { margin: 14px 0 0; font-family: var(--mono); font-size: 14px; color: var(--muted); }
+
+  .carousel { position: relative; max-width: 820px; margin: 0 auto; }
+  .track { overflow: hidden; }
+  .slides { display: flex; transition: transform .5s cubic-bezier(.6,.05,.1,1); }
+  .slide { min-width: 100%; padding: 0 clamp(8px, 4vw, 40px); }
+  .quote {
+    font-size: clamp(19px, 2.4vw, 27px); line-height: 1.5; font-weight: 500;
+    letter-spacing: -0.01em; text-wrap: pretty; text-align: center;
+  }
+  .quote::before { content: "“"; }
+  .quote::after { content: "”"; }
+  .attrib {
+    margin-top: 24px; text-align: center;
+    font-family: var(--mono); font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .carousel-ctrl {
+    display: flex; align-items: center; justify-content: center; gap: 22px;
+    margin-top: clamp(36px, 5vw, 56px);
+  }
+  .cbtn {
+    width: 46px; height: 46px; border: 1.5px solid var(--fg); background: var(--bg);
+    border-radius: 50%; cursor: pointer; display: grid; place-items: center;
+    font-family: var(--mono); font-size: 16px; transition: background .2s, color .2s;
+  }
+  .cbtn:hover { background: var(--fg); color: var(--bg); }
+  .dots { display: flex; gap: 10px; }
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--fg);
+    background: transparent; padding: 0; cursor: pointer; transition: background .2s;
+  }
+  .dot[aria-current="true"] { background: var(--fg); }
+
+  /* ---------- FOOTER ---------- */
+  footer.site {
+    border-top: 1px solid var(--line-strong);
+    padding: clamp(36px, 5vw, 56px) 0 clamp(48px, 6vw, 72px);
+    display: flex; flex-wrap: wrap; gap: 16px 32px;
+    align-items: center; justify-content: space-between;
+  }
+  footer.site .copy { font-weight: 700; letter-spacing: -0.01em; }
+  footer.site .made { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  footer.site .made b { color: var(--fg); font-weight: 700; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 760px) {
+    .columns { grid-template-columns: 1fr; }
+    .nav-links a:not(.brand) { font-size: 12px; }
+    .hero-tag { display: none; }
+  }
+  @media (max-width: 520px) {
+    .nav-links { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a href="#top" class="brand"><span class="dot"></span>Nicholas Gellerman</a>
+      <nav class="nav-links">
+        <a href="#top">Portfolio</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Contact &amp; About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="wrap hero">
+      <h1 style="font-size: 95px">NICHOLAS GELLERMAN</h1>
+      <div class="hero-sub">
+        <span class="hero-tag" style="font-size: 20px">// builder · designer · maker</span>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS — TWO COLUMNS ============ -->
+    <div class="wrap">
+      <div class="columns">
+        <!-- SOFTWARE COLUMN -->
+        <div class="col">
+          <div class="section-label" id="software">
+            <h2>HARDWARE</h2>
+            <div class="rule"></div>
+            <span class="count">02</span>
+          </div>
+
+      <article class="project">
+        <div class="pj-media"><div class="ph"><img src="assets/sensor-array.jpg" style="object-position: center 75%;" alt="Silicon sensor PCB arrays mounted on an optical table with test boards and cabling" /></div></div>
+        <div class="pj-body">
+          <span class="pj-num">01</span>
+          <h3>Particle Accelerator Sensor Array</h3>
+          <p>Designed a vacuum-based alignment jig for the Silicon Vertex Detector on the Electron Ion Collider, hitting 0.14mm precision across ~2,300 sensor mountings. Delivered 20 silicon PCB arrays validated at CERN and now in active use at LBNL.</p>
+          <a href="sensor-array.html" class="pj-cta">READ BLOG POST
+↗</a>
+        </div>
+      </article>
+
+      <article class="project">
+        <div class="pj-media"><div class="ph"><video data-src="assets/microg.mp4" loop muted playsinline preload="none" aria-label="NASA Micro-g NExT passive capture tool dock demonstration"></video></div></div>
+        <div class="pj-body">
+          <span class="pj-num">03</span>
+          <h3>NASA MicroG Next - Passive Capture Tool Dock</h3>
+          <p>A passive capture tool dock for spacewalk operations in low Earth orbit, selected for NASA's Micro-g NExT program. The dual-actuation, single-fault-tolerant locking mechanism is machined from 6061-T6 aluminum and clears all 16 NASA compliance requirements — holding a 15 lb retention load at a 2.0+ safety factor while weighing just 0.69 lb inside a 2.5 × 3.97 × 2.99 in envelope.</p>
+          <a href="#" class="pj-cta">BLOG POST COMING SOON
+↗</a>
+        </div>
+      </article>
+        </div>
+
+        <!-- HARDWARE COLUMN -->
+        <div class="col">
+          <div class="section-label" id="hardware">
+            <h2>SOFTWARE</h2>
+            <div class="rule"></div>
+            <span class="count">02</span>
+          </div>
+
+      <article class="project">
+        <div class="pj-media"><div class="ph"><video data-src="assets/lego-robot.mp4" loop muted playsinline preload="none" aria-label="UR7e robot arm assembling Duplo Lego bricks"></video></div></div>
+        <div class="pj-body">
+          <span class="pj-num">02</span>
+          <h3>Robot Lego Assembler</h3>
+          <p>A full-stack robotic pipeline, built in ROS2, that autonomously assembles arbitrary Duplo Lego builds with a UR7e arm. A 3D point-cloud vision system pairs DBSCAN clustering with LAB color classification to read brick poses and colors at a near-100% detection rate, while an inverse-kinematics motion planner lands placements at 85% success under tight press-fit tolerances.</p>
+          <a href="https://joemattson.github.io/Robotic-Duplo-Assembler/" target="_blank" rel="noopener" class="pj-cta">READ PROJECT WEBSITE
+↗</a>
+        </div>
+      </article>
+
+      <article class="project">
+        <div class="pj-media"><div class="ph"><video data-src="assets/snoscout.mp4" loop muted playsinline preload="none" aria-label="SnoScout avalanche rescue rover in operation"></video></div></div>
+        <div class="pj-body">
+          <span class="pj-num">04</span>
+          <h3>SnoScout - Advanced Avalanche Rescue</h3>
+          <p>A ground-based search-and-rescue rover that autonomously homes in on buried avalanche beacons. A software-defined radio feeds a custom GNU Radio pipeline that extracts the 457kHz beacon signal in real time, and a GPS-encoder sensor fusion system uses DBSCAN clustering over SNR-weighted geospatial data to pinpoint where the victim lies.</p>
+          <a href="snoscout.html" class="pj-cta">Read Project <span class="arrow">↗</span></a>
+        </div>
+      </article>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site wrap" id="contact">
+    <div class="copy">
+</div>
+    <div class="made">Made with <b>♥</b> by <b>Nicholas</b></div>
+  </footer>
+
+  <script>
+    // Lazy-load cover videos: only fetch + play when scrolled into view,
+    // pause + release when out of view. Keeps initial page load light.
+    (function () {
+      const vids = document.querySelectorAll('video[data-src]');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          const v = e.target;
+          if (e.isIntersecting) {
+            if (!v.src) v.src = v.dataset.src;
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0.1 });
+      vids.forEach((v) => io.observe(v));
+    })();
+  </script>
+</body>
+</html>
